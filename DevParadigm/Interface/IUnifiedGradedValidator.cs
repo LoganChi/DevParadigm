@@ -1,7 +1,7 @@
 ﻿using DevParadigm.Basement;
-using DevParadigm.Basement.Results;
 using DevParadigm.Basement.Units;
-using DevParadigm.Enum;
+using DevParadigm.Common.Enum;
+using DevParadigm.Common.Results;
 
 namespace DevParadigm.Interface;
 

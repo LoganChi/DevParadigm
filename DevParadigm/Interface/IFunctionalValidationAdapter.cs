@@ -1,4 +1,4 @@
-﻿using DevParadigm.Basement.Results;
+﻿using DevParadigm.Common.Results;
 
 namespace DevParadigm.Interface;
 

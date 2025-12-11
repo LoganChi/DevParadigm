@@ -10,5 +10,4 @@ public interface IRepository<TEntity, TKey> : IReadOnlyRepository<TEntity, TKey>
     where TEntity : class
     where TKey : IEquatable<TKey>
 {
-    
 }

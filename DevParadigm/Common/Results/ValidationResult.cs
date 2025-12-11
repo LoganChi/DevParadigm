@@ -1,4 +1,4 @@
-﻿namespace DevParadigm.Basement.Results;
+﻿namespace DevParadigm.Common.Results;
 
 /// <summary>
 /// 校验结果模型（属性级+业务级统一）

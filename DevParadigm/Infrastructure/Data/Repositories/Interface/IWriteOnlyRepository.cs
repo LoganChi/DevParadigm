@@ -25,7 +25,22 @@ public interface IWriteOnlyRepository<TEntity, TKey>
     Task UpdateAsync(TEntity entity, CancellationToken cancellationToken = default);
     
     /// <summary>
+    /// 部分更新（仅更新指定属性，避免全量更新性能问题）
+    /// </summary>
+    Task UpdatePartialAsync(TKey id, Dictionary<string, object> updateProperties, CancellationToken cancellationToken = default);
+    
+    /// <summary>
     /// 删除实体（主库）
     /// </summary>
     Task DeleteAsync(TKey id, CancellationToken cancellationToken = default);
+    
+    /// <summary>
+    /// 批量删除数据
+    /// </summary>
+    Task DeleteRangeAsync(IEnumerable<TKey> ids, CancellationToken cancellationToken = default);
+    
+    /// <summary>
+    /// 提交写操作（统一数据持久化入口）
+    /// </summary>
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

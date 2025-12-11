@@ -1,12 +1,7 @@
-﻿using DevParadigm.Enum;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using DevParadigm.Common.Enum;
 
-namespace DevParadigm.Attribute
+namespace DevParadigm.Common.Attribute
 {
     /// <summary>
     /// 分级校验特性基类（复用.NET原生校验体系）

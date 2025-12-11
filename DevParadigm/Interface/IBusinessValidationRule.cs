@@ -1,5 +1,5 @@
 ﻿using DevParadigm.Basement.Units;
-using DevParadigm.Enum;
+using DevParadigm.Common.Enum;
 
 namespace DevParadigm.Interface;
 

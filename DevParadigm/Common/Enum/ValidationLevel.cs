@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DevParadigm.Enum
+﻿namespace DevParadigm.Common.Enum
 {
     /// <summary>
     /// 校验分级（全局统一）

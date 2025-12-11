@@ -1,4 +1,4 @@
-﻿namespace DevParadigm.Basement.Results;
+﻿namespace DevParadigm.Common.Results;
 
 /// <summary>
 /// 全局统一返回结果（不可变）
