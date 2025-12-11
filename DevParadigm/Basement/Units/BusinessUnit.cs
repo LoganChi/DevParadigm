@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DevParadigm.Basement;
+namespace DevParadigm.Basement.Units;
 
 /// <summary>
 /// 业务单元

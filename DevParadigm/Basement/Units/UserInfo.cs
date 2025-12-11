@@ -1,4 +1,4 @@
-﻿namespace DevParadigm.Basement;
+﻿namespace DevParadigm.Basement.Units;
 
 /// <summary>
 /// 用户信息抽象
