@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevParadigm", "DevParadigm\DevParadigm.csproj", "{B6FA5A85-91B0-490E-9854-5BB3AE321167}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "BusinessValidation", "BusinessValidation\BusinessValidation.fsproj", "{7E1C6ED6-E24B-47F0-A6CC-B7950F53FD9B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{B6FA5A85-91B0-490E-9854-5BB3AE321167}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6FA5A85-91B0-490E-9854-5BB3AE321167}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6FA5A85-91B0-490E-9854-5BB3AE321167}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E1C6ED6-E24B-47F0-A6CC-B7950F53FD9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E1C6ED6-E24B-47F0-A6CC-B7950F53FD9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E1C6ED6-E24B-47F0-A6CC-B7950F53FD9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E1C6ED6-E24B-47F0-A6CC-B7950F53FD9B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
