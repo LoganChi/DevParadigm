@@ -17,7 +17,7 @@ namespace DevParadigm.Example.Utils.Handlers;
 public class CreateOrderHandler : BaseBusinessHandler<CreateOrderInput, Order, CreateOrderOutput, Guid>
 {
     private readonly OrderCreationBusinessRule _orderBusinessRule;
-    private readonly StockWriteRepository _stockWriteRepository;
+    private readonly StockRepository _stockRepository;
 
     public CreateOrderHandler(
         IUnifiedGradedValidator validator,
@@ -26,11 +26,11 @@ public class CreateOrderHandler : BaseBusinessHandler<CreateOrderInput, Order, C
         ITransactionManager transactionManager,
         object dbContext,
         OrderCreationBusinessRule orderBusinessRule,
-        StockWriteRepository stockWriteRepository)
+        StockRepository stockRepository)
         : base(validator, entityBuilder, repository, transactionManager, dbContext)
     {
         _orderBusinessRule = orderBusinessRule;
-        _stockWriteRepository = stockWriteRepository;
+        _stockRepository = stockRepository;
     }
 
     /// <summary>
@@ -72,7 +72,7 @@ public class CreateOrderHandler : BaseBusinessHandler<CreateOrderInput, Order, C
             await Repository.AddAsync(entity, cancellationToken);
             
             // 2. 扣减库存（主库）
-            await _stockWriteRepository.DeductStockAsync(input.ProductId, input.Quantity, cancellationToken);
+            await _stockRepository.DeductStockAsync(input.ProductId, input.Quantity, cancellationToken);
             
             // 3. 返回输出结果
             return new CreateOrderOutput

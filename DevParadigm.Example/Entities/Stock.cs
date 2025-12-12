@@ -20,5 +20,5 @@ public class Stock
     /// <summary>
     /// 最后更新时间
     /// </summary>
-    public DateTime UpdateTime { get; set; }
+    public DateTime? UpdateTime { get; set; }
 }

@@ -27,7 +27,7 @@ public static class DependencyInjection
             options.UseSqlite(configuration.GetConnectionString("ReadDb")));
         // 注册 object 类型的 dbContext
         services.AddScoped(sp => (object)sp.GetRequiredService<WriteDbContext>());
-        services.AddScoped<StockWriteRepository>();
+        services.AddScoped<StockRepository>();
         // 2. 注册仓储
         services.AddScoped<IWriteOnlyRepository<Order, Guid>, OrderWriteRepository>();
         services.AddScoped<IReadOnlyRepository<Order, Guid>, OrderReadRepository>();
