@@ -4,6 +4,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevParadigm", "DevParadigm\
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "BusinessValidation", "BusinessValidation\BusinessValidation.fsproj", "{7E1C6ED6-E24B-47F0-A6CC-B7950F53FD9B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevParadigm.Example", "DevParadigm.Example\DevParadigm.Example.csproj", "{94ECDF58-48FB-4CB2-9D25-EABEA97710BF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevParadigm.Console", "DevParadigm.Console\DevParadigm.Console.csproj", "{093FD1E9-C3AF-4BF2-A230-D72ED8F15500}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,13 @@ Global
 		{7E1C6ED6-E24B-47F0-A6CC-B7950F53FD9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E1C6ED6-E24B-47F0-A6CC-B7950F53FD9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E1C6ED6-E24B-47F0-A6CC-B7950F53FD9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94ECDF58-48FB-4CB2-9D25-EABEA97710BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94ECDF58-48FB-4CB2-9D25-EABEA97710BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94ECDF58-48FB-4CB2-9D25-EABEA97710BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94ECDF58-48FB-4CB2-9D25-EABEA97710BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{093FD1E9-C3AF-4BF2-A230-D72ED8F15500}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{093FD1E9-C3AF-4BF2-A230-D72ED8F15500}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{093FD1E9-C3AF-4BF2-A230-D72ED8F15500}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{093FD1E9-C3AF-4BF2-A230-D72ED8F15500}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
