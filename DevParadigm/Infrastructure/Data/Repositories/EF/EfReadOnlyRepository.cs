@@ -32,7 +32,7 @@ public class EfReadOnlyRepository<TEntity, TKey, TReadDbContext> : IReadOnlyRepo
         if (id == null) throw new ArgumentNullException(nameof(id));
         
         var dbSet = useReadDb ? ReadDbSet : ReadDbContext.Set<TEntity>(); // 主库用同上下文或切换写上下文
-        return await dbSet.FindAsync(new[] { id }, cancellationToken);
+        return await dbSet.FindAsync( id , cancellationToken);
     }
 
     /// <summary>

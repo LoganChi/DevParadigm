@@ -22,22 +22,18 @@ public abstract class BaseBusinessHandler<TInput, TEntity, TOutput, TKey> : IBus
     protected readonly IRepository<TEntity, TKey> Repository;
     protected readonly ITransactionManager TransactionManager;
     protected readonly object DbContext; // 解耦ORM，不绑定EF
-    protected readonly IServiceProvider ServiceProvider; // 添加 ServiceProvider 属性
-
     protected BaseBusinessHandler(
         IUnifiedGradedValidator validator,
         IEntityBuilder<TInput, TEntity> entityBuilder,
         IRepository<TEntity, TKey> repository,
         ITransactionManager transactionManager,
-        object dbContext,
-        IServiceProvider serviceProvider)
+        object dbContext)
     {
         Validator = validator;
         EntityBuilder = entityBuilder;
         Repository = repository;
         TransactionManager = transactionManager;
         DbContext = dbContext;
-        ServiceProvider = serviceProvider;
     }
 
     /// <summary>
@@ -55,8 +51,7 @@ public abstract class BaseBusinessHandler<TInput, TEntity, TOutput, TKey> : IBus
             {
                 Input = input,
                 User = user,
-                DbContext = DbContext,
-                ServiceProvider = this.ServiceProvider // 假设 BaseBusinessHandler 中有注入 IServiceProvider
+                DbContext = DbContext
             };
 
             // 2. 分级校验（属性级+业务规则级）
