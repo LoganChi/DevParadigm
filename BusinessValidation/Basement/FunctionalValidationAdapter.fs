@@ -1,7 +1,7 @@
 ﻿namespace BusinessValidation.Basement
 
 open DevParadigm.Basement.Units
-open DevParadigm.Enum
+open DevParadigm.Common.Enum
 open DevParadigm.Interface
 
 // C#接口适配层
