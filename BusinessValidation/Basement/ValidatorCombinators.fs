@@ -84,6 +84,23 @@ module ValidatorCombinators =
             if predicate target context then FsValidationResult<'T>.Success target
             else FsValidationResult<'T>.Failure target [errorFactory target context]
 
+    /// 提取上下文值并进行校验，避免重复提取
+    let verifyVal (selector: 'T -> 'Context -> 'Val) (predicate: 'Val -> 'T -> bool) (errorFactory: 'Val -> 'T -> BusinessError) : Validator<'T, 'Context> =
+        fun target context ->
+            let value = selector target context
+            if predicate value target then FsValidationResult<'T>.Success target
+            else FsValidationResult<'T>.Failure target [errorFactory value target]
+
+    type ValidationBuilder() =
+        member _.Yield(v: Validator<'T, 'Context>) = [v]
+        member _.YieldFrom(vs: Validator<'T, 'Context> list) = vs
+        member _.Combine(a, b) = a @ b
+        member _.Delay(f) = f()
+        member _.Zero() = []
+        member _.Run(validators) = all validators
+
+    let validation = ValidationBuilder()
+
     /// 管道操作符
     module Operators =
         /// 组合校验（收集所有错误）: v1 <&> v2
