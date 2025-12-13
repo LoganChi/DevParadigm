@@ -30,7 +30,7 @@ var createOrderInput = new CreateOrderInput
 {
     UserId = "U123456",
     ProductId = Guid.Parse("12345678-1234-1234-1234-1234567890AB"),
-    Quantity = 3,
+    Quantity = 6,
     Remark = "测试订单备注，长度可能超出限制..."
 };
 

@@ -96,7 +96,14 @@ public class UnifiedGradedValidator : IUnifiedGradedValidator
 
                 if (result != ValidationResult.Success)
                 {
-                    // 判断是否为分级校验特性
+                    // 1. 核心完整性校验（Required）必须是强制的，不可降级
+                    if (attr is RequiredAttribute)
+                    {
+                        mandatoryErrors[property.Name] = result.ErrorMessage ?? $"{property.Name}不能为空";
+                        continue;
+                    }
+
+                    // 2. 判断是否为分级校验特性
                     if (attr is GradedValidationAttribute gradedAttr)
                     {
                         if (gradedAttr.Level == ValidationLevel.Mandatory)
@@ -110,8 +117,17 @@ public class UnifiedGradedValidator : IUnifiedGradedValidator
                     }
                     else
                     {
-                        // 普通DataAnnotations默认强制校验
-                        mandatoryErrors[property.Name] = result.ErrorMessage ?? $"{property.Name}校验失败";
+                        // 3. 检查属性上是否有分级校验特性定义了规则
+                        var propertyGradedAttr = validationAttributes.OfType<GradedValidationAttribute>().FirstOrDefault();
+                        if (propertyGradedAttr != null && propertyGradedAttr.Level == ValidationLevel.NonMandatory)
+                        {
+                            nonMandatoryErrors[property.Name] = result.ErrorMessage ?? $"{property.Name}校验失败";
+                        }
+                        else
+                        {
+                            // 普通DataAnnotations默认强制校验
+                            mandatoryErrors[property.Name] = result.ErrorMessage ?? $"{property.Name}校验失败";
+                        }
                     }
                 }
             }

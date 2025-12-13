@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using DevParadigm.Common.Enum;
 
 namespace DevParadigm.Common.Attribute;
 
@@ -8,6 +9,11 @@ namespace DevParadigm.Common.Attribute;
 /// </summary>
 public class NonMandatoryValidationAttribute : GradedValidationAttribute
 {
+    public NonMandatoryValidationAttribute()
+    {
+        Level = ValidationLevel.NonMandatory;
+    }
+
     protected override bool IsValidValue(object value)
     {
         // 基础校验逻辑（可根据需要自定义）

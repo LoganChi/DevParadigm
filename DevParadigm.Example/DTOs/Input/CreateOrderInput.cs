@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using DevParadigm.Common.Attribute;
 using DevParadigm.Common.Enum;
 using DevParadigm.Interface;
@@ -27,9 +27,8 @@ public class CreateOrderInput : IOrderData
     /// 购买数量（强制校验+范围校验）
     /// </summary>
     [Required(ErrorMessage = "购买数量不能为空")]
-    [Range(1, 100, ErrorMessage = "购买数量必须在1-100之间")]
+    [Range(1, 5, ErrorMessage = "购买数量必须在1-5之间")]
     [NonMandatoryValidation(
-        Level = ValidationLevel.Mandatory, 
         NonMandatoryTip = "购买数量超出常规范围，是否继续？")]
     public int Quantity { get; set; }
     
@@ -38,7 +37,6 @@ public class CreateOrderInput : IOrderData
     /// </summary>
     [StringLength(500, ErrorMessage = "备注长度不能超过500")]
     [NonMandatoryValidation(
-        Level = ValidationLevel.NonMandatory,
         NonMandatoryTip = "备注过长，是否继续？")]
     public string? Remark { get; set; }
 }
