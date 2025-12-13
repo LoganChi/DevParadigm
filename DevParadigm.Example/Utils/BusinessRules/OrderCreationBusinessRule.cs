@@ -1,13 +1,16 @@
 using BusinessValidation.Basement;
 using DevParadigm.Basement.Units;
+using DevParadigm.Common.Attribute;
 using DevParadigm.Common.Enum;
 using DevParadigm.Common.Results;
 using DevParadigm.Example.DTOs.Input;
 using DevParadigm.Example.Entities;
 using DevParadigm.Interface;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DevParadigm.Example.Utils.BusinessRules;
 
+[Service(ServiceLifetime.Scoped)]
 public class OrderCreationBusinessRule : IBusinessValidationRule<CreateOrderInput>
 {
     private readonly IReadOnlyRepository<Stock, Guid> _stockRepository;

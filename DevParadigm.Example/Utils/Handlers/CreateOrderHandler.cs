@@ -1,5 +1,6 @@
 using DevParadigm.Basement.Handler;
 using DevParadigm.Basement.Units;
+using DevParadigm.Common.Attribute;
 using DevParadigm.Common.Enum;
 using DevParadigm.Common.Results;
 using DevParadigm.Example.DTOs.Input;
@@ -8,12 +9,14 @@ using DevParadigm.Example.Entities;
 using DevParadigm.Example.Repositories;
 using DevParadigm.Example.Utils.BusinessRules;
 using DevParadigm.Interface;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DevParadigm.Example.Utils.Handlers;
 
 /// <summary>
 /// 订单创建业务处理器（整合全流程）
 /// </summary>
+[Service(ServiceLifetime.Scoped)]
 public class CreateOrderHandler : BaseBusinessHandler<CreateOrderInput, Order, CreateOrderOutput, Guid>
 {
     private readonly IBusinessValidationRule<CreateOrderInput> _orderBusinessRule;

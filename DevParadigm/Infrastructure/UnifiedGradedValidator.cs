@@ -5,21 +5,16 @@ using DevParadigm.Common.Attribute;
 using DevParadigm.Common.Enum;
 using DevParadigm.Common.Results;
 using DevParadigm.Interface;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DevParadigm.Infrastructure;
 
 /// <summary>
 /// 统一分级校验器（属性级+业务级）
 /// </summary>
+[Service(ServiceLifetime.Singleton)]
 public class UnifiedGradedValidator : IUnifiedGradedValidator
 {
-    private readonly IServiceProvider _serviceProvider;
-
-    public UnifiedGradedValidator(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
-
     /// <summary>
     /// 执行分级校验
     /// </summary>

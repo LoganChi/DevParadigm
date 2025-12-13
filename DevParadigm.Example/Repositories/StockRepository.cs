@@ -1,15 +1,19 @@
-﻿using DevParadigm.Example.DbContexts;
+using DevParadigm.Common.Attribute;
+using DevParadigm.Example.DbContexts;
 using DevParadigm.Example.Entities;
 using DevParadigm.Infrastructure.Data.Repositories.EF;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DevParadigm.Example.Repositories;
 
 /// <summary>
-/// 库存读写仓储聚合
+/// 库存读写仓储
 /// </summary>
+[Service(ServiceLifetime.Scoped)]
 public class StockRepository : EfRepository<Stock, Guid, WriteDbContext, ReadDbContext>
 {
-    public StockRepository(WriteDbContext writeDbContext, ReadDbContext readDbContext)
+    public StockRepository(WriteDbContext writeDbContext, ReadDbContext readDbContext) 
         : base(writeDbContext, readDbContext) { }
     /// <summary>
     /// 扣减库存（读写分离版本）

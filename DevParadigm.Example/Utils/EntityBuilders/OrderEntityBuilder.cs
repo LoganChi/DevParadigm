@@ -1,13 +1,16 @@
-﻿using DevParadigm.Basement.Units;
+using DevParadigm.Basement.Units;
+using DevParadigm.Common.Attribute;
 using DevParadigm.Example.DTOs.Input;
 using DevParadigm.Example.Entities;
 using DevParadigm.Interface;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DevParadigm.Example.Utils.EntityBuilders;
 
 /// <summary>
 /// 订单实体生成器
 /// </summary>
+[Service(ServiceLifetime.Singleton)]
 public class OrderEntityBuilder : IEntityBuilder<CreateOrderInput, Order>
 {
     /// <summary>
