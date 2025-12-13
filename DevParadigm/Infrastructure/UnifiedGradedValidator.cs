@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using DevParadigm.Basement.Units;
 using DevParadigm.Common.Attribute;
@@ -36,23 +36,20 @@ public class UnifiedGradedValidator : IUnifiedGradedValidator
                 { "InputNull", "输入参数不能为空" }
             });
         }
-
-        // 1. 属性级校验（基于DataAnnotations+自定义分级特性）
+                                                                  
+        // 1. 属性级校验（仅针对输入本身的字段）
         var (mandatoryAttrErrors, nonMandatoryAttrErrors) = ValidateAttributes(input);
-
-        // 2. 业务规则校验
-        var (mandatoryRuleErrors, nonMandatoryRuleErrors) = await ValidateBusinessRules(input, unit);
 
         // 合并强制校验错误
         var allMandatoryErrors = new Dictionary<string, string>();
-        foreach (var error in mandatoryAttrErrors.Concat(mandatoryRuleErrors))
+        foreach (var error in mandatoryAttrErrors)
         {
             allMandatoryErrors[error.Key] = error.Value;
         }
 
         // 合并非强制校验错误
         var allNonMandatoryErrors = new Dictionary<string, string>();
-        foreach (var error in nonMandatoryAttrErrors.Concat(nonMandatoryRuleErrors))
+        foreach (var error in nonMandatoryAttrErrors)
         {
             allNonMandatoryErrors[error.Key] = error.Value;
         }

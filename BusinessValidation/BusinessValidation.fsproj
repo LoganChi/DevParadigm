@@ -10,6 +10,7 @@
         <Compile Include="Basement\Validator.fs" />
         <Compile Include="Basement\FunctionalValidationAdapter.fs" />
         <Compile Include="Basement\ValidatorCombinators.fs" />
+        <Compile Include="Business\OrderValidation.fs" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,4 +1,4 @@
-﻿using DevParadigm.Basement.Handler;
+using DevParadigm.Basement.Handler;
 using DevParadigm.Basement.Units;
 using DevParadigm.Common.Enum;
 using DevParadigm.Common.Results;
@@ -33,13 +33,8 @@ public class CreateOrderHandler : BaseBusinessHandler<CreateOrderInput, Order, C
         _stockRepository = stockRepository;
     }
 
-    /// <summary>
-    /// 自定义业务逻辑校验（库存+用户规则）
-    /// </summary>
-    protected override async Task<ApiResult<bool>> ValidateBusinessLogicAsync(CreateOrderInput input, BusinessUnit unit)
-    {
-        return await _orderBusinessRule.ValidateAsync(input, unit);
-    }
+    protected override Task<ApiResult<bool>> ValidateBusinessLogicAsync(CreateOrderInput input, BusinessUnit unit)
+        => _orderBusinessRule.ValidateAsync(input, unit);
 
     /// <summary>
     /// 实体生成后后置处理（可选）

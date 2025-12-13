@@ -1,14 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using DevParadigm.Common.Attribute;
 using DevParadigm.Common.Enum;
-
+using DevParadigm.Interface;
 
 namespace DevParadigm.Example.DTOs.Input;
 
 /// <summary>
 /// 订单创建输入DTO
 /// </summary>
-public class CreateOrderInput
+public class CreateOrderInput : IOrderData
 {
     /// <summary>
     /// 用户ID（强制校验）
