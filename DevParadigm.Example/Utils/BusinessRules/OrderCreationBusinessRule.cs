@@ -8,9 +8,6 @@ using DevParadigm.Interface;
 
 namespace DevParadigm.Example.Utils.BusinessRules;
 
-/// <summary>
-/// 订单创建业务规则校验器
-/// </summary>
 public class OrderCreationBusinessRule : IBusinessValidationRule<CreateOrderInput>
 {
     private readonly IReadOnlyRepository<Stock, Guid> _stockRepository;
@@ -30,18 +27,6 @@ public class OrderCreationBusinessRule : IBusinessValidationRule<CreateOrderInpu
     public ValidationLevel Level => ValidationLevel.Mandatory;
     public string FailureMessage => "库存不足，无法创建订单";
     public string NonMandatoryTip => string.Empty;
-
-    public bool Validate(CreateOrderInput input, BusinessUnit unit)
-    {
-        var validationResult = OrderValidation.validateOrderAll(input, unit);
-        return validationResult.IsValid;
-    }
-
-    public IEnumerable<string> GetErrors(CreateOrderInput input, BusinessUnit unit)
-    {
-        var validationResult = OrderValidation.validateOrderAll(input, unit);
-        return validationResult.Errors;
-    }
 
     /// <summary>
     /// 异步校验（适配业务处理器）
@@ -64,7 +49,7 @@ public class OrderCreationBusinessRule : IBusinessValidationRule<CreateOrderInpu
             var validationResult = OrderValidation.validateOrderAll(input, unit);
             if (!validationResult.IsValid)
             {
-                var errors = validationResult.Errors.ToList();
+                var errors = validationResult.Errors.Select(e => e.Message).ToList();
                 return ApiResult<bool>.Fail("业务规则校验失败", errors);
             }
 

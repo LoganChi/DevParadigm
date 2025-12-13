@@ -1,18 +1,14 @@
-﻿using DevParadigm.Basement.Units;
+using DevParadigm.Basement.Units;
 using DevParadigm.Common.Enum;
+using DevParadigm.Common.Results;
 
 namespace DevParadigm.Interface;
 
-/// <summary>
-/// 业务逻辑校验规则核心接口
-/// </summary>
-/// <typeparam name="TInput">输入类型</typeparam>
 public interface IBusinessValidationRule<in TInput>
 {
     string RuleId { get; }
     ValidationLevel Level { get; }
     string FailureMessage { get; }
     string NonMandatoryTip { get; }
-    bool Validate(TInput input, BusinessUnit context);
-    IEnumerable<string> GetErrors(TInput input, BusinessUnit context);
+    Task<ApiResult<bool>> ValidateAsync(TInput input, BusinessUnit context);
 }

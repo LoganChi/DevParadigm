@@ -120,39 +120,5 @@ public class UnifiedGradedValidator : IUnifiedGradedValidator
         return (mandatoryErrors, nonMandatoryErrors);
     }
 
-    /// <summary>
-    /// 业务规则校验（分级）
-    /// </summary>
-    private async Task<(Dictionary<string, string> MandatoryErrors, Dictionary<string, string> NonMandatoryErrors)> ValidateBusinessRules<TInput>(TInput input, BusinessUnit unit)
-    {
-        var mandatoryErrors = new Dictionary<string, string>();
-        var nonMandatoryErrors = new Dictionary<string, string>();
-
-        // 获取所有业务规则校验器
-        var ruleTypes = Assembly.GetExecutingAssembly()
-            .GetTypes()
-            .Where(t => !t.IsAbstract && typeof(IBusinessValidationRule<TInput>).IsAssignableFrom(t));
-
-        foreach (var ruleType in ruleTypes)
-        {
-            if (_serviceProvider.GetService(ruleType) is IBusinessValidationRule<TInput> rule)
-            {
-                if (!rule.Validate(input, unit))
-                {
-                    var errors = rule.GetErrors(input, unit).ToList();
-                    if (rule.Level == ValidationLevel.Mandatory)
-                    {
-                        mandatoryErrors[rule.RuleId] = errors.FirstOrDefault() ?? rule.FailureMessage;
-                    }
-                    else
-                    {
-                        nonMandatoryErrors[rule.RuleId] = errors.FirstOrDefault() ?? rule.FailureMessage;
-                    }
-                }
-            }
-        }
-
-        return await Task.FromResult((mandatoryErrors, nonMandatoryErrors));
-    }
     #endregion
 }

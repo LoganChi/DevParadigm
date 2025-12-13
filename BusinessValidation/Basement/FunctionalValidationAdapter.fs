@@ -1,10 +1,11 @@
-﻿namespace BusinessValidation.Basement
+namespace BusinessValidation.Basement
 
+open System.Threading.Tasks
 open DevParadigm.Basement.Units
 open DevParadigm.Common.Enum
+open DevParadigm.Common.Results
 open DevParadigm.Interface
 
-// C#接口适配层
 type FunctionalValidationAdapter<'T, 'Context when 'Context :> BusinessUnit>(
     validator: Validator<'T, 'Context>,
     context: 'Context,
@@ -18,10 +19,12 @@ type FunctionalValidationAdapter<'T, 'Context when 'Context :> BusinessUnit>(
         member this.Level = level
         member this.FailureMessage = failureMessage
         member this.NonMandatoryTip = nonMandatoryTip
-        member this.Validate(input, context) =
+        member this.ValidateAsync(input, context) =
             let fsContext = context :?> 'Context
-            validator input fsContext |> fun r -> r.IsValid
-        member this.GetErrors(input, context) =
-            let fsContext = context :?> 'Context
-            validator input fsContext |> fun r -> r.Errors :> seq<string>
+            let result = validator input fsContext
+            if result.IsValid then
+                Task.FromResult(ApiResult<bool>.Ok(true))
+            else
+                let messages = result.Errors |> List.map (fun e -> e.Message) |> List.toArray
+                Task.FromResult(ApiResult<bool>.Fail(failureMessage, System.Collections.Generic.List<string>(messages)))
 
