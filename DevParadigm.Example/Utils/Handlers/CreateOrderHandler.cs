@@ -16,7 +16,7 @@ namespace DevParadigm.Example.Utils.Handlers;
 /// </summary>
 public class CreateOrderHandler : BaseBusinessHandler<CreateOrderInput, Order, CreateOrderOutput, Guid>
 {
-    private readonly OrderCreationBusinessRule _orderBusinessRule;
+    private readonly IBusinessValidationRule<CreateOrderInput> _orderBusinessRule;
     private readonly StockRepository _stockRepository;
 
     public CreateOrderHandler(
@@ -25,7 +25,7 @@ public class CreateOrderHandler : BaseBusinessHandler<CreateOrderInput, Order, C
         IRepository<Order, Guid> repository,
         ITransactionManager transactionManager,
         object dbContext,
-        OrderCreationBusinessRule orderBusinessRule,
+        IBusinessValidationRule<CreateOrderInput> orderBusinessRule,
         StockRepository stockRepository)
         : base(validator, entityBuilder, repository, transactionManager, dbContext)
     {

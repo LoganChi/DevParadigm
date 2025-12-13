@@ -1,4 +1,4 @@
-﻿using DevParadigm.Example.DbContexts;
+using DevParadigm.Example.DbContexts;
 using DevParadigm.Example.DTOs.Input;
 using DevParadigm.Example.DTOs.Output;
 using DevParadigm.Example.Entities;
@@ -43,6 +43,7 @@ public static class DependencyInjection
         // 4. 注册校验器
         services.AddScoped<IUnifiedGradedValidator, UnifiedGradedValidator>();
         services.AddScoped<OrderCreationBusinessRule>();
+        services.AddScoped<IBusinessValidationRule<CreateOrderInput>, OrderCreationBusinessRule>();
 
         // 5. 注册实体生成器
         services.AddScoped<IEntityBuilder<CreateOrderInput, Order>, OrderEntityBuilder>();
