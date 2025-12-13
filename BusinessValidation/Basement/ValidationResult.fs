@@ -1,13 +1,14 @@
-﻿namespace BusinessValidation.Basement
+namespace BusinessValidation.Basement
 
-// 不可变校验结果
-type ValidationResult<'T> = {
+open DevParadigm.Common.Results
+
+type FsValidationResult<'T> = {
     IsValid: bool
     Target: 'T
-    Errors: string list
+    Errors: BusinessError list
 } with
     static member Success target = { IsValid = true; Target = target; Errors = [] }
     static member Failure target errors = { IsValid = false; Target = target; Errors = errors }
     member this.Combine other =
-        if this.IsValid && other.IsValid then ValidationResult<'T>.Success this.Target
+        if this.IsValid && other.IsValid then FsValidationResult<'T>.Success this.Target
         else { IsValid = false; Target = this.Target; Errors = this.Errors @ other.Errors }
