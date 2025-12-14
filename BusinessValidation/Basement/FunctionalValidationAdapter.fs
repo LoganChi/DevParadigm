@@ -19,12 +19,13 @@ type FunctionalValidationAdapter<'T, 'Context when 'Context :> BusinessUnit>(
         member this.Level = level
         member this.FailureMessage = failureMessage
         member this.NonMandatoryTip = nonMandatoryTip
-        member this.ValidateAsync(input, context) =
+        member this.ValidateAsync(input, context) = task {
             let fsContext = context :?> 'Context
-            let result = validator input fsContext
+            let! result = validator input fsContext
             if result.IsValid then
-                Task.FromResult(ApiResult<bool>.Ok(true))
+                return ApiResult<bool>.Ok(true)
             else
                 let messages = result.Errors |> List.map (fun e -> e.Message) |> List.toArray
-                Task.FromResult(ApiResult<bool>.Fail(failureMessage, System.Collections.Generic.List<string>(messages)))
+                return ApiResult<bool>.Fail(failureMessage, System.Collections.Generic.List<string>(messages))
+        }
 

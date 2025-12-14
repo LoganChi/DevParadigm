@@ -3,7 +3,9 @@ namespace BusinessValidation.Basement
 open DevParadigm.Basement.Units
 open DevParadigm.Common.Results
 
-type Validator<'T, 'Context> = 'T -> 'Context -> FsValidationResult<'T>
+open System.Threading.Tasks
+
+type Validator<'T, 'Context> = 'T -> 'Context -> Task<FsValidationResult<'T>>
 
 // 创建一个专门的辅助模块来包含这些通用函数
 module ValidatorHelpers =

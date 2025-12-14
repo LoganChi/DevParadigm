@@ -43,5 +43,5 @@ module OrderValidation =
             validateOrderLimit
         }
 
-    let validateOrderAll (input: IOrderData) (context: BusinessUnit) : FsValidationResult<IOrderData> =
+    let validateOrderAll (input: IOrderData) (context: BusinessUnit) =
         allOrderRules input context

@@ -49,7 +49,7 @@ public class OrderCreationBusinessRule : IBusinessValidationRule<CreateOrderInpu
             unit.Extensions["TodayOrderCount"] = orderCount;
 
             // 2. 调用 F# 业务规则（库存 + 下单次数）
-            var validationResult = OrderValidation.validateOrderAll(input, unit);
+            var validationResult = await OrderValidation.validateOrderAll(input, unit);
             if (!validationResult.IsValid)
             {
                 var errors = validationResult.Errors.Select(e => e.Message).ToList();
