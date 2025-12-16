@@ -113,6 +113,10 @@ module ValidatorCombinators =
             else FsValidationResult<'T>.Failure target [errorFactory value target]
         )
 
+    /// 校验值必须在指定的集合中
+    let isInList (allowedValues: 'T seq) (error: BusinessError) : Validator<'T, 'Context> =
+        must (fun v -> Seq.contains v allowedValues) error
+
     type ValidationBuilder() =
         member _.Yield(v: Validator<'T, 'Context>) = [v]
         member _.YieldFrom(vs: Validator<'T, 'Context> list) = vs
