@@ -18,24 +18,37 @@ module ValidatorCombinators =
             let indexedValidators = validators |> List.indexed
             
             // 自动根据 CPU 核心数进行并行节流 (Throttling)
-            do! Parallel.ForEachAsync(indexedValidators, Func<_,_,_>(fun (index, validator) _ ->
-                ValueTask(task {
-                    let! result = validator target context
+            // 优化：针对小规模集合，直接串行执行以避免 Parallel.ForEachAsync 的调度开销
+            if validators.Length < 4 then
+                let mutable allErrors = []
+                for v in validators do
+                    let! result = v target context
                     if not result.IsValid then
-                        errorsBag.Add(index, result.Errors)
-                })
-            ))
-
-            if errorsBag.IsEmpty then
-                return FsValidationResult<'T>.Success target
+                        allErrors <- result.Errors @ allErrors
+                
+                if List.isEmpty allErrors then
+                    return FsValidationResult<'T>.Success target
+                else
+                    return FsValidationResult<'T>.Failure target (List.rev allErrors)
             else
-                // 恢复错误顺序 (Deterministic Order)
-                let allErrors = 
-                    errorsBag 
-                    |> Seq.sortBy fst 
-                    |> Seq.collect snd 
-                    |> List.ofSeq
-                return FsValidationResult<'T>.Failure target allErrors
+                do! Parallel.ForEachAsync(indexedValidators, Func<_,_,_>(fun (index, validator) _ ->
+                    ValueTask(task {
+                        let! result = validator target context
+                        if not result.IsValid then
+                            errorsBag.Add(index, result.Errors)
+                    })
+                ))
+
+                if errorsBag.IsEmpty then
+                    return FsValidationResult<'T>.Success target
+                else
+                    // 恢复错误顺序 (Deterministic Order)
+                    let allErrors = 
+                        errorsBag 
+                        |> Seq.sortBy fst 
+                        |> Seq.collect snd 
+                        |> List.ofSeq
+                    return FsValidationResult<'T>.Failure target allErrors
         }
 
     /// 顺序运行校验器，遇到第一个失败即停止（短路模式）
@@ -85,59 +98,96 @@ module ValidatorCombinators =
             else return FsValidationResult<'T>.Failure target result.Errors
         }
 
-    /// 针对集合元素的校验适配器 (并行优化：Parallel.ForEachAsync)
+    /// 针对集合元素的校验适配器 (并行优化：Parallel.ForEachAsync + 小集合优化)
     let forEach (selector: 'T -> 'Item seq) (validator: Validator<'Item, 'Context>) : Validator<'T, 'Context> =
         fun target context -> task {
-            let items = selector target |> Seq.indexed
-            let errorsBag = ConcurrentBag<int * BusinessError list>()
+            let itemsSeq = selector target
             
-            // 针对大数据量集合，Parallel.ForEachAsync 优势巨大
-            do! Parallel.ForEachAsync(items, Func<_,_,_>(fun (index, item) _ ->
-                ValueTask(task {
+            // 优化：先尝试获取 Count，如果集合很小则直接串行处理
+            // 注意：不要多次枚举 itemsSeq，先转为数组或列表
+            let itemsArray = itemsSeq |> Seq.toArray
+            
+            if itemsArray.Length < 4 then
+                let mutable allErrors = []
+                for item in itemsArray do
                     let! result = validator item context
                     if not result.IsValid then
-                        errorsBag.Add(index, result.Errors)
-                })
-            ))
-            
-            if errorsBag.IsEmpty then
-                return FsValidationResult<'T>.Success target
+                        allErrors <- result.Errors @ allErrors
+                
+                if List.isEmpty allErrors then
+                    return FsValidationResult<'T>.Success target
+                else
+                    return FsValidationResult<'T>.Failure target (List.rev allErrors)
             else
-                let errors =
-                    errorsBag
-                    |> Seq.sortBy fst // 保证错误顺序与列表顺序一致
-                    |> Seq.collect snd
-                    |> List.ofSeq
-                return FsValidationResult<'T>.Failure target errors
+                let indexedItems = itemsArray |> Array.indexed
+                let errorsBag = ConcurrentBag<int * BusinessError list>()
+                
+                // 针对大数据量集合，Parallel.ForEachAsync 优势巨大
+                do! Parallel.ForEachAsync(indexedItems, Func<_,_,_>(fun (index, item) _ ->
+                    ValueTask(task {
+                        let! result = validator item context
+                        if not result.IsValid then
+                            errorsBag.Add(index, result.Errors)
+                    })
+                ))
+                
+                if errorsBag.IsEmpty then
+                    return FsValidationResult<'T>.Success target
+                else
+                    let errors =
+                        errorsBag
+                        |> Seq.sortBy fst // 保证错误顺序与列表顺序一致
+                        |> Seq.collect snd
+                        |> List.ofSeq
+                    return FsValidationResult<'T>.Failure target errors
         }
 
-    /// 针对集合元素的校验适配器（带索引信息，并行优化）
+    /// 针对集合元素的校验适配器（带索引信息，并行优化 + 小集合优化）
     let forEachIndexed (selector: 'T -> 'Item seq) (validator: Validator<'Item, 'Context>) : Validator<'T, 'Context> =
         fun target context -> task {
-            let items = selector target |> Seq.indexed
-            let errorsBag = ConcurrentBag<int * BusinessError list>()
+            let itemsSeq = selector target
+            let itemsArray = itemsSeq |> Seq.toArray
             
-            do! Parallel.ForEachAsync(items, Func<_,_,_>(fun (index, item) _ ->
-                ValueTask(task {
+            if itemsArray.Length < 4 then
+                let mutable allErrors = []
+                for i = 0 to itemsArray.Length - 1 do
+                    let item = itemsArray.[i]
                     let! result = validator item context
                     if not result.IsValid then
-                        // 在并行任务内部处理错误消息格式化，分摊 CPU 开销
                         let indexedErrors = 
                             result.Errors 
-                            |> List.map (fun e -> BusinessError(e.Code, $"[{index}] {e.Message}"))
-                        errorsBag.Add(index, indexedErrors)
-                })
-            ))
-
-            if errorsBag.IsEmpty then
-                return FsValidationResult<'T>.Success target
+                            |> List.map (fun e -> BusinessError(e.Code, $"[{i}] {e.Message}"))
+                        allErrors <- indexedErrors @ allErrors
+                        
+                if List.isEmpty allErrors then
+                    return FsValidationResult<'T>.Success target
+                else
+                    return FsValidationResult<'T>.Failure target (List.rev allErrors)
             else
-                let errors =
-                    errorsBag
-                    |> Seq.sortBy fst
-                    |> Seq.collect snd
-                    |> List.ofSeq
-                return FsValidationResult<'T>.Failure target errors
+                let indexedItems = itemsArray |> Array.indexed
+                let errorsBag = ConcurrentBag<int * BusinessError list>()
+                
+                do! Parallel.ForEachAsync(indexedItems, Func<_,_,_>(fun (index, item) _ ->
+                    ValueTask(task {
+                        let! result = validator item context
+                        if not result.IsValid then
+                            // 在并行任务内部处理错误消息格式化，分摊 CPU 开销
+                            let indexedErrors = 
+                                result.Errors 
+                                |> List.map (fun e -> BusinessError(e.Code, $"[{index}] {e.Message}"))
+                            errorsBag.Add(index, indexedErrors)
+                    })
+                ))
+
+                if errorsBag.IsEmpty then
+                    return FsValidationResult<'T>.Success target
+                else
+                    let errors =
+                        errorsBag
+                        |> Seq.sortBy fst
+                        |> Seq.collect snd
+                        |> List.ofSeq
+                    return FsValidationResult<'T>.Failure target errors
         }
 
     /// 上下文依赖断言（支持动态错误消息）
