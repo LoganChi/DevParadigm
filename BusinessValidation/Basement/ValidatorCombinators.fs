@@ -19,7 +19,8 @@ module ValidatorCombinators =
             
             // 自动根据 CPU 核心数进行并行节流 (Throttling)
             // 优化：针对小规模集合，直接串行执行以避免 Parallel.ForEachAsync 的调度开销
-            if validators.Length < 4 then
+            // 使用 Environment.ProcessorCount 作为动态阈值，通常在 8-16 之间，小于此值时并行收益不明显
+            if validators.Length < Environment.ProcessorCount then
                 let mutable allErrors = []
                 for v in validators do
                     let! result = v target context
@@ -107,7 +108,8 @@ module ValidatorCombinators =
             // 注意：不要多次枚举 itemsSeq，先转为数组或列表
             let itemsArray = itemsSeq |> Seq.toArray
             
-            if itemsArray.Length < 4 then
+            // 使用 Environment.ProcessorCount 作为动态阈值，确保只在任务足够多时才启用并行
+            if itemsArray.Length < Environment.ProcessorCount then
                 let mutable allErrors = []
                 for item in itemsArray do
                     let! result = validator item context
@@ -148,7 +150,8 @@ module ValidatorCombinators =
             let itemsSeq = selector target
             let itemsArray = itemsSeq |> Seq.toArray
             
-            if itemsArray.Length < 4 then
+            // 使用 Environment.ProcessorCount 作为动态阈值
+            if itemsArray.Length < Environment.ProcessorCount then
                 let mutable allErrors = []
                 for i = 0 to itemsArray.Length - 1 do
                     let item = itemsArray.[i]
