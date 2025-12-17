@@ -1,4 +1,4 @@
-﻿using DevParadigm.Example.Entities;
+using DevParadigm.Example.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace DevParadigm.Example.DbContexts;
@@ -12,6 +12,7 @@ public class ReadDbContext : DbContext
 
     public DbSet<Order> Orders { get; set; }
     public DbSet<Stock> Stocks { get; set; }
+    public DbSet<Merchant> Merchants { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -1,5 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using DevParadigm.Common.Attribute;
 
 namespace DevParadigm.Example.Entities;
 
@@ -12,6 +13,11 @@ public class Order
     [Key]
     public Guid Id { get; set; }
     
+    /// <summary>
+    /// 商家ID
+    /// </summary>
+    public Guid MerchantId { get; set; }
+
     /// <summary>
     /// 订单编号
     /// </summary>
@@ -45,5 +51,6 @@ public class Order
     /// <summary>
     /// 订单状态（0-待支付，1-已支付，2-已取消）
     /// </summary>
+    [AllowedValues(0, 1, 2)]
     public int Status { get; set; } = 0;
 }
