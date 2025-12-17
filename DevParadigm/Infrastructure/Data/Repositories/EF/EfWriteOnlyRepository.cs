@@ -70,7 +70,7 @@ public class EfWriteOnlyRepository<TEntity, TKey, TWriteDbContext> : IWriteOnlyR
     /// <summary>
     /// 删除实体（强制主库）
     /// </summary>
-    public virtual async Task DeleteAsync(TKey id, CancellationToken cancellationToken = default)
+    public virtual Task DeleteAsync(TKey id, CancellationToken cancellationToken = default)
     {
         if (id == null) throw new ArgumentNullException(nameof(id));
         
@@ -82,12 +82,13 @@ public class EfWriteOnlyRepository<TEntity, TKey, TWriteDbContext> : IWriteOnlyR
         
         WriteDbContext.Attach(entity);
         WriteDbSet.Remove(entity);
+        return Task.CompletedTask;
     }
 
     /// <summary>
     /// 批量删除数据（强制主库）
     /// </summary>
-    public virtual async Task DeleteRangeAsync(IEnumerable<TKey> ids, CancellationToken cancellationToken = default)
+    public virtual Task DeleteRangeAsync(IEnumerable<TKey> ids, CancellationToken cancellationToken = default)
     {
         if (ids == null || !ids.Any()) throw new ArgumentException("删除ID集合不能为空", nameof(ids));
 
@@ -103,6 +104,7 @@ public class EfWriteOnlyRepository<TEntity, TKey, TWriteDbContext> : IWriteOnlyR
 
         WriteDbContext.AttachRange(entities);
         WriteDbSet.RemoveRange(entities);
+        return Task.CompletedTask;
     }
 
     /// <summary>
