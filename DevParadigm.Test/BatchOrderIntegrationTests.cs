@@ -23,6 +23,9 @@ public class BatchOrderIntegrationTests : IDisposable
 
     public BatchOrderIntegrationTests()
     {
+        // Force load DevParadigm assembly for service scanning
+        var _ = typeof(DevParadigm.Infrastructure.UnifiedGradedValidator);
+
         var services = new ServiceCollection();
         var configuration = new ConfigurationBuilder().Build();
 
@@ -122,6 +125,7 @@ public class BatchOrderIntegrationTests : IDisposable
 
         // Assert
         Assert.True(result.Success, $"Batch handler failed: {string.Join(", ", result.Errors ?? new List<string>())}");
+        Assert.NotNull(result.Data);
         Assert.Equal(2, result.Data.SuccessCount);
         Assert.Equal(0, result.Data.FailureCount);
     }
