@@ -13,6 +13,7 @@
         <Compile Include="Basement\CascadeValidator.fs" />
         <Compile Include="Basement\UniqueValidator.fs" />
         <Compile Include="Business\OrderValidation.fs" />
+        <Compile Include="Business\BatchOrderValidation.fs" />
     </ItemGroup>
 
     <ItemGroup>

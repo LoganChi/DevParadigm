@@ -14,6 +14,11 @@ namespace DevParadigm.Example.Utils.EntityBuilders;
 public class OrderEntityBuilder : IEntityBuilder<CreateOrderInput, Order>
 {
     /// <summary>
+    /// 默认商家ID（用于测试和示例）
+    /// </summary>
+    public static readonly Guid DefaultMerchantId = Guid.Parse("33333333-3333-3333-3333-333333333333");
+
+    /// <summary>
     /// DTO转换为订单实体
     /// </summary>
     public Order Build(CreateOrderInput input, BusinessUnit unit)
@@ -27,6 +32,7 @@ public class OrderEntityBuilder : IEntityBuilder<CreateOrderInput, Order>
         return new Order
         {
             Id = Guid.NewGuid(),
+            MerchantId = DefaultMerchantId,
             OrderNo = orderNo,
             UserId = userId,
             ProductId = input.ProductId,

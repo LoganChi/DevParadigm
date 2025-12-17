@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using DevParadigm.Common.Attribute;
 using DevParadigm.Common.Enum;
 using DevParadigm.Interface;
@@ -21,6 +21,7 @@ public class CreateOrderInput : IOrderData
     /// 商品ID（强制校验）
     /// </summary>
     [Required(ErrorMessage = "商品ID不能为空")]
+    [Unique(ErrorMessage = "批量下单中包含重复的商品")]
     public Guid ProductId { get; set; }
     
     /// <summary>
