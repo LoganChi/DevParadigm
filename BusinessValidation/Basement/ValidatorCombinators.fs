@@ -10,46 +10,27 @@ open DevParadigm.Common.Results
 module ValidatorCombinators =
     
     /// 运行所有校验器并收集所有错误 
-    /// (并行优化：使用 Parallel.ForEachAsync 限制并发度，避免 Task.WhenAll 导致的线程池/CPU爆炸)
+    /// (回归串行：针对单个对象的规则组合，串行执行效率最高，避免并行调度的额外开销)
     let all (validators: Validator<'T, 'Context> list) : Validator<'T, 'Context> =
         fun target context -> task {
-            // 使用 ConcurrentBag 线程安全地收集错误，同时记录索引以保证最终顺序
-            let errorsBag = ConcurrentBag<int * BusinessError list>()
-            let indexedValidators = validators |> List.indexed
+            // 纯串行实现
+            // 理由：
+            // 1. 针对单个对象的校验规则通常数量不多（<20），且多为CPU密集型（非空、正则、长度），并行调度开销大于收益。
+            // 2. 避免 Task.WhenAll 或 Parallel 导致的线程池压力和上下文切换。
+            // 3. 只有数据层级（forEach）才需要并行，规则层级（all）应保持简单。
+            let mutable allErrors = []
             
-            // 自动根据 CPU 核心数进行并行节流 (Throttling)
-            // 优化：针对小规模集合，直接串行执行以避免 Parallel.ForEachAsync 的调度开销
-            // 使用 Environment.ProcessorCount 作为动态阈值，通常在 8-16 之间，小于此值时并行收益不明显
-            if validators.Length < Environment.ProcessorCount then
-                let mutable allErrors = []
-                for v in validators do
-                    let! result = v target context
-                    if not result.IsValid then
-                        allErrors <- result.Errors @ allErrors
-                
-                if List.isEmpty allErrors then
-                    return FsValidationResult<'T>.Success target
-                else
-                    return FsValidationResult<'T>.Failure target (List.rev allErrors)
+            for v in validators do
+                let! result = v target context
+                if not result.IsValid then
+                    // 收集错误
+                    allErrors <- result.Errors @ allErrors
+            
+            if List.isEmpty allErrors then
+                return FsValidationResult<'T>.Success target
             else
-                do! Parallel.ForEachAsync(indexedValidators, Func<_,_,_>(fun (index, validator) _ ->
-                    ValueTask(task {
-                        let! result = validator target context
-                        if not result.IsValid then
-                            errorsBag.Add(index, result.Errors)
-                    })
-                ))
-
-                if errorsBag.IsEmpty then
-                    return FsValidationResult<'T>.Success target
-                else
-                    // 恢复错误顺序 (Deterministic Order)
-                    let allErrors = 
-                        errorsBag 
-                        |> Seq.sortBy fst 
-                        |> Seq.collect snd 
-                        |> List.ofSeq
-                    return FsValidationResult<'T>.Failure target allErrors
+                // 恢复错误顺序 (因为 prepend 导致顺序反了，需要 rev)
+                return FsValidationResult<'T>.Failure target (List.rev allErrors)
         }
 
     /// 顺序运行校验器，遇到第一个失败即停止（短路模式）
@@ -100,16 +81,20 @@ module ValidatorCombinators =
         }
 
     /// 针对集合元素的校验适配器 (并行优化：Parallel.ForEachAsync + 小集合优化)
+    /// 这是“数据并行”的发生地：针对列表数据进行并发处理
     let forEach (selector: 'T -> 'Item seq) (validator: Validator<'Item, 'Context>) : Validator<'T, 'Context> =
         fun target context -> task {
             let itemsSeq = selector target
             
-            // 优化：先尝试获取 Count，如果集合很小则直接串行处理
-            // 注意：不要多次枚举 itemsSeq，先转为数组或列表
+            // 优化：先转为数组，以便判断数量和进行分区
             let itemsArray = itemsSeq |> Seq.toArray
             
-            // 使用 Environment.ProcessorCount 作为动态阈值，确保只在任务足够多时才启用并行
-            if itemsArray.Length < Environment.ProcessorCount then
+            // 如果集合为空，直接通过
+            if itemsArray.Length = 0 then
+                return FsValidationResult<'T>.Success target
+            // 使用 Environment.ProcessorCount 作为动态阈值
+            // 小规模数据：串行处理更快，无调度开销
+            elif itemsArray.Length < Environment.ProcessorCount then
                 let mutable allErrors = []
                 for item in itemsArray do
                     let! result = validator item context
@@ -121,10 +106,10 @@ module ValidatorCombinators =
                 else
                     return FsValidationResult<'T>.Failure target (List.rev allErrors)
             else
+                // 大规模数据：启用并行处理 (Parallel.ForEachAsync)
                 let indexedItems = itemsArray |> Array.indexed
                 let errorsBag = ConcurrentBag<int * BusinessError list>()
                 
-                // 针对大数据量集合，Parallel.ForEachAsync 优势巨大
                 do! Parallel.ForEachAsync(indexedItems, Func<_,_,_>(fun (index, item) _ ->
                     ValueTask(task {
                         let! result = validator item context
@@ -150,8 +135,9 @@ module ValidatorCombinators =
             let itemsSeq = selector target
             let itemsArray = itemsSeq |> Seq.toArray
             
-            // 使用 Environment.ProcessorCount 作为动态阈值
-            if itemsArray.Length < Environment.ProcessorCount then
+            if itemsArray.Length = 0 then
+                return FsValidationResult<'T>.Success target
+            elif itemsArray.Length < Environment.ProcessorCount then
                 let mutable allErrors = []
                 for i = 0 to itemsArray.Length - 1 do
                     let item = itemsArray.[i]
