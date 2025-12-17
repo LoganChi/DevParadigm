@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace DevParadigm.Interface;
@@ -41,8 +41,7 @@ public class EfTransactionManager<TWriteDbContext> : ITransactionManager
 
         try
         {
-            // 先提交EF Core的变更，再提交事务（确保变更先写入事务日志）
-            await _writeDbContext.SaveChangesAsync(cancellationToken);
+            // 提交事务
             await _currentTransaction.CommitAsync(cancellationToken);
         }
         finally
