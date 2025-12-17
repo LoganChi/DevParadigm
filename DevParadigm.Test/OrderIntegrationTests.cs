@@ -27,6 +27,9 @@ public class OrderIntegrationTests : IDisposable
 
     public OrderIntegrationTests()
     {
+        // Force load DevParadigm assembly for service scanning
+        var _ = typeof(DevParadigm.Infrastructure.UnifiedGradedValidator);
+
         var services = new ServiceCollection();
         var configuration = new ConfigurationBuilder().Build();
 
